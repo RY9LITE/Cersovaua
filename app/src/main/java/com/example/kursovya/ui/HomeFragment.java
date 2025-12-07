@@ -1,0 +1,82 @@
+package com.example.kursovya.ui;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.kursovya.R;
+import com.example.kursovya.adapters.PetAdapter;
+import com.example.kursovya.model.Pet;
+import com.example.kursovya.viewmodel.SharedViewModel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class HomeFragment extends Fragment {
+
+    private SharedViewModel sharedViewModel;
+    private RecyclerView recyclerPets;
+    private PetAdapter adapter;
+    private ArrayList<Pet> favorites = new ArrayList<>();
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_home, container, false);
+
+        recyclerPets = v.findViewById(R.id.recyclerPets);
+
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        adapter = new PetAdapter(createMockPets(), pet -> {
+            Intent i = new Intent(getActivity(), PetProfileActivity.class);
+            i.putExtra("pet", pet);
+            startActivity(i);
+        });
+
+        recyclerPets.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerPets.setAdapter(adapter);
+
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) { return false; }
+            @Override public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int pos = viewHolder.getAdapterPosition();
+                Pet swiped = adapter.removeAt(pos);
+                if (direction == ItemTouchHelper.RIGHT) {
+                    sharedViewModel.addToFavorites(swiped);
+                    Toast.makeText(getActivity(), "Добавлено: " + swiped.getName(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Пропущено: " + swiped.getName(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        new ItemTouchHelper(callback).attachToRecyclerView(recyclerPets);
+
+        return v;
+    }
+
+    private List<Pet> createMockPets() {
+        List<Pet> list = new ArrayList<>();
+
+        list.add(new Pet("1", "Барсик", "Кот", "Дворовый", "2 года",
+                "Добрый", Arrays.asList("https://placekitten.com/800/500")));
+
+        list.add(new Pet("2", "Мурка", "Кошка", "Сиамская", "1 год",
+                "Игривая", Arrays.asList("https://placekitten.com/801/500")));
+
+        list.add(new Pet("3", "Шарик", "Собака", "Дворняга", "3 года",
+                "Друг", Arrays.asList("https://placedog.net/800/500")));
+
+        return list;
+    }
+
+}
