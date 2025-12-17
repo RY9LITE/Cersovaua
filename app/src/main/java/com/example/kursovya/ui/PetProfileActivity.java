@@ -38,13 +38,12 @@ public class PetProfileActivity extends AppCompatActivity {
             tvName.setText(pet.getName());
             tvDetails.setText(pet.getType() + " • " + pet.getBreed() + " • " + pet.getAge());
             tvDesc.setText(pet.getDescription());
-            List<String> photos = pet.getPhotos();
-            if (photos != null && !photos.isEmpty()) {
-                Glide.with(this).load(photos.get(0)).into(img);
-            } else {
-                img.setImageResource(R.drawable.ic_launcher_background);
-            }
+
+            Glide.with(this)
+                    .load(pet.getPhotoUrl())
+                    .into(img);
         }
     }
+
 }
 

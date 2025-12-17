@@ -18,8 +18,6 @@ public class ProfileFragment extends Fragment {
 
         Button logout = v.findViewById(R.id.btnLogout);
         logout.setOnClickListener(view -> {
-            // позже здесь будет FirebaseAuth.getInstance().signOut();
-            // пока просто:
             System.out.println("Выход из профиля");
         });
 

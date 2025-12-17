@@ -20,6 +20,7 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.ViewHolder> {
         void onItemClick(Pet pet);
     }
 
+
     private List<Pet> items;
     private OnItemClickListener listener;
 
@@ -47,19 +48,23 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(PetAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         Pet pet = items.get(position);
+
         holder.tvName.setText(pet.getName());
         holder.tvSub.setText(pet.getType() + " • " + pet.getAge());
-        if (pet.getPhotos() != null && !pet.getPhotos().isEmpty()) {
-            Glide.with(holder.img.getContext()).load(pet.getPhotos().get(0)).into(holder.img);
-        } else {
-            holder.img.setImageResource(R.drawable.ic_launcher_background);
-        }
+
+        Glide.with(holder.img.getContext())
+                .load(pet.getPhotoUrl())
+                .into(holder.img);
+
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onItemClick(pet);
+            if (listener != null) {
+                listener.onItemClick(pet);
+            }
         });
     }
+
 
     @Override
     public int getItemCount() {

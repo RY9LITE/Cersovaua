@@ -1,43 +1,50 @@
 package com.example.kursovya.model;
 
-import java.io.Serializable;
-import java.util.List;
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
+@Entity(tableName = "pets")
 public class Pet implements Serializable {
+
+    @PrimaryKey(autoGenerate = false)
+    @NonNull
     private String id;
+
     private String name;
     private String type;
     private String breed;
     private String age;
     private String description;
-    private List<String> photos;
+    private String photoUrl;
 
-    public Pet() {}
-
-    public Pet(String id, String name, String type, String breed, String age, String description, List<String> photos) {
+    public Pet(@NonNull String id,
+               String name,
+               String type,
+               String breed,
+               String age,
+               String description,
+               String photoUrl) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.breed = breed;
         this.age = age;
         this.description = description;
-        this.photos = photos;
+        this.photoUrl = photoUrl;
     }
 
-    public String getId() { return id; }
+    @NonNull
+    public String getId() {
+        return id;
+    }
+
     public String getName() { return name; }
     public String getType() { return type; }
     public String getBreed() { return breed; }
     public String getAge() { return age; }
     public String getDescription() { return description; }
-    public List<String> getPhotos() { return photos; }
-
-    public void setId(String id) { this.id = id; }
-    public void setName(String name) { this.name = name; }
-    public void setType(String type) { this.type = type; }
-    public void setBreed(String breed) { this.breed = breed; }
-    public void setAge(String age) { this.age = age; }
-    public void setDescription(String description) { this.description = description; }
-    public void setPhotos(List<String> photos) { this.photos = photos; }
+    public String getPhotoUrl() { return photoUrl; }
 }
-
