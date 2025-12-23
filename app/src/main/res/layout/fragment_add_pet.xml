@@ -1,65 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F7F7F7">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="24dp">
+
+        <ImageView
+            android:id="@+id/imgPet"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"
+            android:src="@android:drawable/ic_menu_camera"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_circle"
+            android:contentDescription="Фото питомца"/>
 
         <EditText
             android:id="@+id/etName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Имя"/>
+            android:hint="Имя"
+            android:background="@drawable/bg_edit_text"
+            android:padding="14dp"
+            android:textColor="#222222"
+            android:textColorHint="#999999"
+            android:layout_marginBottom="12dp"/>
 
         <EditText
             android:id="@+id/etType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Тип"/>
+            android:hint="Тип"
+            android:background="@drawable/bg_edit_text"
+            android:padding="14dp"
+            android:textColor="#222222"
+            android:textColorHint="#999999"
+            android:layout_marginBottom="12dp"/>
 
         <EditText
             android:id="@+id/etBreed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Порода"/>
+            android:hint="Порода"
+            android:background="@drawable/bg_edit_text"
+            android:padding="14dp"
+            android:textColor="#222222"
+            android:textColorHint="#999999"
+            android:layout_marginBottom="12dp"/>
 
         <EditText
             android:id="@+id/etAge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Возраст"/>
+            android:hint="Возраст"
+            android:background="@drawable/bg_edit_text"
+            android:padding="14dp"
+            android:inputType="number"
+            android:textColor="#222222"
+            android:textColorHint="#999999"
+            android:layout_marginBottom="12dp"/>
 
         <EditText
             android:id="@+id/etDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Описание"/>
-
-        <ImageView
-            android:id="@+id/imgPet"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="12dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_pet_placeholder"/>
+            android:hint="Описание"
+            android:background="@drawable/bg_edit_text"
+            android:padding="14dp"
+            android:minLines="3"
+            android:gravity="top"
+            android:textColor="#222222"
+            android:textColorHint="#999999"
+            android:layout_marginBottom="20dp"/>
 
         <Button
             android:id="@+id/btnPickImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Выбрать фото"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_button_secondary"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"/>
+
 
         <Button
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Сохранить"
-            android:layout_marginTop="12dp"/>
+            android:background="@drawable/bg_button_primary"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textAllCaps="false"/>
 
     </LinearLayout>
+
 </ScrollView>

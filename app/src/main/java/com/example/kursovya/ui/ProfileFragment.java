@@ -34,6 +34,10 @@ import com.example.kursovya.model.Pet;
 import com.example.kursovya.viewmodel.SharedViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
+import com.example.kursovya.auth.AuthManager;
+import com.example.kursovya.auth.LoginActivity;
+
+
 import java.util.ArrayList;
 
 public class ProfileFragment extends Fragment {
@@ -69,6 +73,7 @@ public class ProfileFragment extends Fragment {
         recyclerFavorites = v.findViewById(R.id.recyclerFavorites);
         Button btnEdit = v.findViewById(R.id.btnEditName);
         Button btnClear = v.findViewById(R.id.btnClearFavorites);
+        Button btnLogout = v.findViewById(R.id.btnLogout);
 
         tvUserName.setText(prefs.getString(KEY_NAME, "Пользователь"));
         tvUserDesc.setText(prefs.getString(KEY_DESC, "Описание профиля"));
@@ -204,6 +209,26 @@ public class ProfileFragment extends Fragment {
                     .setNegativeButton("Отмена", null)
                     .show();
         });
+
+        btnLogout.setOnClickListener(v14 -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Выход")
+                    .setMessage("Вы действительно хотите выйти?")
+                    .setPositiveButton("Выйти", (dialog, which) -> {
+
+                        AuthManager auth = new AuthManager(requireContext());
+                        auth.logout();
+
+                        Intent intent = new Intent(requireContext(), LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+
+                        requireActivity().finish();
+                    })
+                    .setNegativeButton("Отмена", null)
+                    .show();
+        });
+
 
         return v;
     }

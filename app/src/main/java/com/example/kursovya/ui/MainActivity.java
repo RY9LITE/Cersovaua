@@ -15,20 +15,36 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        loadFragment(new HomeFragment());
+        BottomNavigationView nav = findViewById(R.id.bottomNavigation);
 
-        bottomNav.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_home)
-                loadFragment(new HomeFragment());
-            else if (item.getItemId() == R.id.nav_matches)
-                loadFragment(new MatchesFragment());
-            else if (item.getItemId() == R.id.nav_profile)
-                loadFragment(new ProfileFragment());
+        if (savedInstanceState == null) {
+            nav.setSelectedItemId(R.id.nav_home);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, new HomeFragment())
+                    .commit();
+        }
+
+        nav.setOnItemSelectedListener(item -> {
+            Fragment fragment;
+
+            if (item.getItemId() == R.id.nav_home) {
+                fragment = new HomeFragment();
+            } else if (item.getItemId() == R.id.nav_matches) {
+                fragment = new FavoritesFragment();
+            } else {
+                fragment = new ProfileFragment();
+            }
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .commit();
+
             return true;
         });
-
     }
+
 
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager()

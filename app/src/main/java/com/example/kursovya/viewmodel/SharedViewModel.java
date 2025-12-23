@@ -28,6 +28,7 @@ public class SharedViewModel extends AndroidViewModel {
     public MutableLiveData<List<Pet>> favorites =
             new MutableLiveData<>(new ArrayList<>());
 
+
     private final Application app;
 
     public SharedViewModel(@NonNull Application application) {

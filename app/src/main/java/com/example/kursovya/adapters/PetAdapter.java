@@ -31,12 +31,17 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.ViewHolder> {
         this.listener = listener;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgPet;
         TextView tvName, tvSub;
+        public ImageView imgLike;
+        public ImageView imgDislike;
+
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            imgLike = itemView.findViewById(R.id.imgLike);
+            imgDislike = itemView.findViewById(R.id.imgDislike);
             imgPet = itemView.findViewById(R.id.imgPet);
             tvName = itemView.findViewById(R.id.tvName);
             tvSub = itemView.findViewById(R.id.tvSub);
@@ -53,6 +58,13 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.itemView.setRotation(0f);
+        holder.itemView.setScaleX(1f);
+        holder.itemView.setScaleY(1f);
+        holder.imgLike.setAlpha(0f);
+        holder.imgDislike.setAlpha(0f);
+
+
         Pet pet = items.get(position);
 
         holder.tvName.setText(pet.getName());

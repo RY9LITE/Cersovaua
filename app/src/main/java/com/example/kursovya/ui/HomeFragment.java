@@ -64,7 +64,7 @@ public class HomeFragment extends Fragment {
         });
 
 
-        recyclerPets.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerPets.setLayoutManager(new StackLayoutManager());
         recyclerPets.setAdapter(adapter);
 
         sharedViewModel.pets.observe(getViewLifecycleOwner(), pets -> {
@@ -141,32 +141,53 @@ public class HomeFragment extends Fragment {
                         }
 
                         sharedViewModel.removePet(pet);
+                        recyclerPets.post(() -> recyclerPets.requestLayout());
                     }
 
 
                     @Override
-                    public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                    public void onChildDraw(Canvas c,
+                                            RecyclerView recyclerView,
                                             RecyclerView.ViewHolder viewHolder,
                                             float dX, float dY,
-                                            int actionState, boolean isCurrentlyActive) {
+                                            int actionState,
+                                            boolean isCurrentlyActive) {
 
                         View itemView = viewHolder.itemView;
+                        PetAdapter.ViewHolder holder = (PetAdapter.ViewHolder) viewHolder;
+
+                        float progress = Math.min(1f, Math.abs(dX) / recyclerView.getWidth());
+
+                        itemView.setRotation(dX / 20f);
+                        itemView.setScaleX(1f - progress * 0.05f);
+                        itemView.setScaleY(1f - progress * 0.05f);
+
                         Paint paint = new Paint();
 
                         if (dX > 0) {
+
                             paint.setColor(Color.parseColor("#4CAF50"));
                             c.drawRect(itemView.getLeft(), itemView.getTop(),
                                     itemView.getLeft() + dX, itemView.getBottom(), paint);
 
+                            holder.imgLike.setAlpha(progress);
+                            holder.imgDislike.setAlpha(0f);
+
                         } else if (dX < 0) {
+
                             paint.setColor(Color.parseColor("#F44336"));
                             c.drawRect(itemView.getRight() + dX, itemView.getTop(),
                                     itemView.getRight(), itemView.getBottom(), paint);
+
+                            holder.imgDislike.setAlpha(progress);
+                            holder.imgLike.setAlpha(0f);
                         }
 
-                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY,
-                                actionState, isCurrentlyActive);
+                        super.onChildDraw(c, recyclerView, viewHolder,
+                                dX, dY, actionState, isCurrentlyActive);
                     }
+
+
                 };
 
         new ItemTouchHelper(callback).attachToRecyclerView(recyclerPets);
