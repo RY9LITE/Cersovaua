@@ -216,7 +216,8 @@ public class ProfileFragment extends Fragment {
                     .setMessage("Вы действительно хотите выйти?")
                     .setPositiveButton("Выйти", (dialog, which) -> {
 
-                        AuthManager auth = new AuthManager(requireContext());
+                        AuthManager auth = AuthManager.getInstance(requireContext());
+
                         auth.logout();
 
                         Intent intent = new Intent(requireContext(), LoginActivity.class);

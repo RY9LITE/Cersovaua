@@ -16,7 +16,8 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        AuthManager auth = new AuthManager(this);
+        AuthManager auth = AuthManager.getInstance(this);
+
 
         EditText etEmail = findViewById(R.id.etEmail);
         EditText etPassword = findViewById(R.id.etPassword);
@@ -27,26 +28,18 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String pass = etPassword.getText().toString();
-            String repeat = etRepeat.getText().toString();
 
-            if (!pass.equals(repeat)) {
-                Toast.makeText(this, "Пароли не совпадают", Toast.LENGTH_SHORT).show();
+            if (email.isEmpty() || pass.isEmpty()) {
+                Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            boolean ok = auth.register(email, pass);
+            auth.register(email, pass);
 
-            if (ok) {
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-            } else {
-                Toast.makeText(
-                        this,
-                        "Ошибка регистрации (email или пароль)",
-                        Toast.LENGTH_SHORT
-                ).show();
-            }
+            Toast.makeText(this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
+            finish();
         });
+
 
         tvLogin.setOnClickListener(v ->
                 startActivity(new Intent(this, LoginActivity.class))

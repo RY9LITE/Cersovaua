@@ -66,4 +66,54 @@ public class Pet implements Serializable {
     public String getPhotoUri() {
         return photoUri;
     }
+
+    public static class Builder {
+
+        private final String id;
+        private String name;
+        private String type;
+        private String breed;
+        private String age;
+        private String description;
+        private String photoUri;
+
+        public Builder(String id) {
+            this.id = id;
+        }
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder setBreed(String breed) {
+            this.breed = breed;
+            return this;
+        }
+
+        public Builder setAge(String age) {
+            this.age = age;
+            return this;
+        }
+
+        public Builder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder setPhotoUri(String photoUri) {
+            this.photoUri = photoUri;
+            return this;
+        }
+
+        public Pet build() {
+            return new Pet(id, name, type, breed, age, description, photoUri);
+        }
+    }
+
 }

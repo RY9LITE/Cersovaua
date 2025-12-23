@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.kursovya.R;
+import com.example.kursovya.factory.PetFactory;
 import com.example.kursovya.model.Pet;
 import com.example.kursovya.viewmodel.SharedViewModel;
 
@@ -79,6 +80,7 @@ public class AddPetFragment extends Fragment {
 
         btnSave.setOnClickListener(view -> {
             if (isEditMode) {
+
                 Pet updated = new Pet(
                         editingPet.getId(),
                         etName.getText().toString(),
@@ -90,19 +92,28 @@ public class AddPetFragment extends Fragment {
                                 ? selectedPhotoUri.toString()
                                 : editingPet.getPhotoUri()
                 );
+
                 vm.updatePet(updated);
+
             } else {
-                Pet pet = new Pet(
-                        UUID.randomUUID().toString(),
-                        etName.getText().toString(),
+
+                Pet basePet = PetFactory.createPet(
                         etType.getText().toString(),
-                        etBreed.getText().toString(),
-                        etAge.getText().toString(),
-                        etDesc.getText().toString(),
-                        selectedPhotoUri != null
-                                ? selectedPhotoUri.toString()
-                                : null
+                        etName.getText().toString(),
+                        etAge.getText().toString()
                 );
+
+                Pet pet = new Pet.Builder(basePet.getId())
+                        .setName(basePet.getName())
+                        .setType(basePet.getType())
+                        .setBreed(etBreed.getText().toString())
+                        .setAge(basePet.getAge())
+                        .setDescription(etDesc.getText().toString())
+                        .setPhotoUri(
+                                selectedPhotoUri != null ? selectedPhotoUri.toString() : null
+                        )
+                        .build();
+
                 vm.addPet(pet);
             }
 
@@ -110,6 +121,7 @@ public class AddPetFragment extends Fragment {
                     .getSupportFragmentManager()
                     .popBackStack();
         });
+
 
         return v;
     }

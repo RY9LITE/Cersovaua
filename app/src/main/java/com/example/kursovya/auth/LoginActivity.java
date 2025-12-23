@@ -15,7 +15,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AuthManager auth = new AuthManager(this);
+        AuthManager auth = AuthManager.getInstance(this);
+
 
         if (auth.isLoggedIn()) {
             startActivity(new Intent(this, MainActivity.class));

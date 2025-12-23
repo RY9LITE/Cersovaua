@@ -2,68 +2,52 @@ package com.example.kursovya.auth;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Patterns;
 
 public class AuthManager {
 
-    private static final String PREFS = "auth_prefs";
-    private static final String USERS = "users";
-    private static final String CURRENT_USER = "current_user";
-
+    private static AuthManager instance;
     private final SharedPreferences prefs;
 
-    public AuthManager(Context context) {
+    private static final String PREFS = "auth_prefs";
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_PASSWORD = "password";
+    private static final String KEY_LOGGED = "logged";
+
+    private AuthManager(Context context) {
         prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
-    public boolean isValidEmail(String email) {
-        return email != null && Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    public boolean isValidPassword(String password) {
-        return password != null && password.length() >= 6;
-    }
-
-    public boolean register(String email, String password) {
-        if (!isValidEmail(email) || !isValidPassword(password)) {
-            return false;
+    public static AuthManager getInstance(Context context) {
+        if (instance == null) {
+            instance = new AuthManager(context.getApplicationContext());
         }
-
-        SharedPreferences.Editor editor = prefs.edit();
-
-        if (prefs.contains(USERS + "_" + email)) {
-            return false;
-        }
-
-        editor.putString(USERS + "_" + email, password);
-        editor.putString(CURRENT_USER, email);
-        editor.apply();
-
-        return true;
+        return instance;
     }
 
     public boolean login(String email, String password) {
-        String savedPassword = prefs.getString(USERS + "_" + email, null);
+        String savedEmail = prefs.getString(KEY_EMAIL, null);
+        String savedPass = prefs.getString(KEY_PASSWORD, null);
 
-        if (savedPassword != null && savedPassword.equals(password)) {
-            prefs.edit()
-                    .putString(CURRENT_USER, email)
-                    .apply();
+        if (email.equals(savedEmail) && password.equals(savedPass)) {
+            prefs.edit().putBoolean(KEY_LOGGED, true).apply();
             return true;
         }
-
         return false;
     }
 
-    public boolean isLoggedIn() {
-        return prefs.getString(CURRENT_USER, null) != null;
+    public void register(String email, String password) {
+        prefs.edit()
+                .putString(KEY_EMAIL, email)
+                .putString(KEY_PASSWORD, password)
+                .apply();
     }
 
-    public String getCurrentUser() {
-        return prefs.getString(CURRENT_USER, null);
+    public boolean isLoggedIn() {
+        return prefs.getBoolean(KEY_LOGGED, false);
     }
 
     public void logout() {
-        prefs.edit().remove(CURRENT_USER).apply();
+        prefs.edit().putBoolean(KEY_LOGGED, false).apply();
     }
 }
+
