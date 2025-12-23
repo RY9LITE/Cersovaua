@@ -19,11 +19,15 @@ public class MainActivity extends AppCompatActivity {
         loadFragment(new HomeFragment());
 
         bottomNav.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_home) loadFragment(new HomeFragment());
-            else if (item.getItemId() == R.id.nav_favorites) loadFragment(new FavoritesFragment());
-            else if (item.getItemId() == R.id.nav_profile) loadFragment(new ProfileFragment());
+            if (item.getItemId() == R.id.nav_home)
+                loadFragment(new HomeFragment());
+            else if (item.getItemId() == R.id.nav_matches)
+                loadFragment(new MatchesFragment());
+            else if (item.getItemId() == R.id.nav_profile)
+                loadFragment(new ProfileFragment());
             return true;
         });
+
     }
 
     private void loadFragment(Fragment fragment) {

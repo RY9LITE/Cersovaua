@@ -40,8 +40,11 @@ public class PetProfileActivity extends AppCompatActivity {
             tvDesc.setText(pet.getDescription());
 
             Glide.with(this)
-                    .load(pet.getPhotoUrl())
+                    .load(pet.getPhotoUri())
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .error(android.R.drawable.ic_delete)
                     .into(img);
+
         }
     }
 

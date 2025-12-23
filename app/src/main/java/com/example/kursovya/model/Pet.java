@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Entity(tableName = "pets")
 public class Pet implements Serializable {
 
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey
     @NonNull
     private String id;
 
@@ -18,7 +18,8 @@ public class Pet implements Serializable {
     private String breed;
     private String age;
     private String description;
-    private String photoUrl;
+
+    private String photoUri;
 
     public Pet(@NonNull String id,
                String name,
@@ -26,14 +27,15 @@ public class Pet implements Serializable {
                String breed,
                String age,
                String description,
-               String photoUrl) {
+               String photoUri) {
+
         this.id = id;
         this.name = name;
         this.type = type;
         this.breed = breed;
         this.age = age;
         this.description = description;
-        this.photoUrl = photoUrl;
+        this.photoUri = photoUri;
     }
 
     @NonNull
@@ -41,10 +43,27 @@ public class Pet implements Serializable {
         return id;
     }
 
-    public String getName() { return name; }
-    public String getType() { return type; }
-    public String getBreed() { return breed; }
-    public String getAge() { return age; }
-    public String getDescription() { return description; }
-    public String getPhotoUrl() { return photoUrl; }
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getPhotoUri() {
+        return photoUri;
+    }
 }

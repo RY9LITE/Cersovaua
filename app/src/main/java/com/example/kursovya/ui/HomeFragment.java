@@ -9,7 +9,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -25,7 +28,6 @@ import com.example.kursovya.viewmodel.SharedViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
@@ -33,26 +35,80 @@ public class HomeFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private RecyclerView recyclerPets;
     private PetAdapter adapter;
-    private ArrayList<Pet> favorites = new ArrayList<>();
+    private List<Pet> allPets = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
         recyclerPets = v.findViewById(R.id.recyclerPets);
+        Spinner spinner = v.findViewById(R.id.spinnerFilter);
+        Button btnAddPet = v.findViewById(R.id.btnAddPet);
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-        adapter = new PetAdapter(createMockPets(), pet -> {
-            Intent i = new Intent(getActivity(), PetProfileActivity.class);
-            i.putExtra("pet", pet);
-            startActivity(i);
+
+        adapter = new PetAdapter(new ArrayList<>(), pet -> {
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("pet", pet);
+
+            AddPetFragment fragment = new AddPetFragment();
+            fragment.setArguments(bundle);
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
-        recyclerPets.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        recyclerPets.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerPets.setAdapter(adapter);
 
+        sharedViewModel.pets.observe(getViewLifecycleOwner(), pets -> {
+            allPets = pets;
+            adapter.updateList(pets);
+        });
+
+        if (sharedViewModel.pets.getValue() == null ||
+                sharedViewModel.pets.getValue().isEmpty()) {
+            sharedViewModel.pets.setValue(createMockPets());
+        }
+
+        btnAddPet.setOnClickListener(view ->
+                requireActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, new AddPetFragment())
+                        .addToBackStack(null)
+                        .commit()
+        );
+
+        ArrayAdapter<CharSequence> spinnerAdapter =
+                ArrayAdapter.createFromResource(
+                        getContext(),
+                        R.array.pet_filters,
+                        android.R.layout.simple_spinner_item
+                );
+
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                applyFilter(parent.getItemAtPosition(position).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
         ItemTouchHelper.SimpleCallback callback =
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                new ItemTouchHelper.SimpleCallback(0,
+                        ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
                     @Override
                     public boolean onMove(RecyclerView recyclerView,
@@ -64,84 +120,52 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                         int pos = viewHolder.getAdapterPosition();
-                        Pet swiped = adapter.removeAt(pos);
+                        Pet pet = adapter.getItems().get(pos);
 
                         if (direction == ItemTouchHelper.RIGHT) {
-                            sharedViewModel.addToFavorites(swiped);
+                            sharedViewModel.addToFavorites(pet);
 
                             Snackbar.make(recyclerPets,
                                             "Добавлено в избранное",
-                                            Snackbar.LENGTH_LONG)
-                                    .setAction("ОТМЕНИТЬ", v -> {
-                                        sharedViewModel.removeFromFavorites(swiped);
-                                    })
+                                            Snackbar.LENGTH_SHORT)
                                     .show();
                         }
+
+                        if (direction == ItemTouchHelper.LEFT) {
+                            sharedViewModel.removeFromFavorites(pet);
+
+                            Snackbar.make(recyclerPets,
+                                            "Удалено",
+                                            Snackbar.LENGTH_SHORT)
+                                    .show();
+                        }
+
+                        sharedViewModel.removePet(pet);
                     }
 
 
                     @Override
-                    public void onChildDraw(Canvas c,
-                                            RecyclerView recyclerView,
+                    public void onChildDraw(Canvas c, RecyclerView recyclerView,
                                             RecyclerView.ViewHolder viewHolder,
-                                            float dX,
-                                            float dY,
-                                            int actionState,
-                                            boolean isCurrentlyActive) {
+                                            float dX, float dY,
+                                            int actionState, boolean isCurrentlyActive) {
 
                         View itemView = viewHolder.itemView;
                         Paint paint = new Paint();
 
                         if (dX > 0) {
                             paint.setColor(Color.parseColor("#4CAF50"));
-                            c.drawRect(
-                                    itemView.getLeft(),
-                                    itemView.getTop(),
-                                    itemView.getLeft() + dX,
-                                    itemView.getBottom(),
-                                    paint
-                            );
-
-                            Drawable icon = ContextCompat.getDrawable(
-                                    getContext(),
-                                    android.R.drawable.btn_star_big_on
-                            );
-
-                            int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
-                            int iconTop = itemView.getTop() + iconMargin;
-                            int iconLeft = itemView.getLeft() + iconMargin;
-                            int iconRight = iconLeft + icon.getIntrinsicWidth();
-                            int iconBottom = iconTop + icon.getIntrinsicHeight();
-
-                            icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-                            icon.draw(c);
+                            c.drawRect(itemView.getLeft(), itemView.getTop(),
+                                    itemView.getLeft() + dX, itemView.getBottom(), paint);
 
                         } else if (dX < 0) {
                             paint.setColor(Color.parseColor("#F44336"));
-                            c.drawRect(
-                                    itemView.getRight() + dX,
-                                    itemView.getTop(),
-                                    itemView.getRight(),
-                                    itemView.getBottom(),
-                                    paint
-                            );
-
-                            Drawable icon = ContextCompat.getDrawable(
-                                    getContext(),
-                                    android.R.drawable.ic_menu_close_clear_cancel
-                            );
-
-                            int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
-                            int iconTop = itemView.getTop() + iconMargin;
-                            int iconRight = itemView.getRight() - iconMargin;
-                            int iconLeft = iconRight - icon.getIntrinsicWidth();
-                            int iconBottom = iconTop + icon.getIntrinsicHeight();
-
-                            icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-                            icon.draw(c);
+                            c.drawRect(itemView.getRight() + dX, itemView.getTop(),
+                                    itemView.getRight(), itemView.getBottom(), paint);
                         }
 
-                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY,
+                                actionState, isCurrentlyActive);
                     }
                 };
 
@@ -149,6 +173,16 @@ public class HomeFragment extends Fragment {
 
 
         return v;
+    }
+
+    private void applyFilter(String filter) {
+        List<Pet> filtered = new ArrayList<>();
+        for (Pet pet : allPets) {
+            if (filter.equals("Все") || pet.getType().equalsIgnoreCase(filter)) {
+                filtered.add(pet);
+            }
+        }
+        adapter.updateList(filtered);
     }
 
     private List<Pet> createMockPets() {
@@ -165,6 +199,4 @@ public class HomeFragment extends Fragment {
 
         return list;
     }
-
-
 }
